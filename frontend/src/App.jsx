@@ -15,6 +15,15 @@ import TenantsDashboard from './pages/SuperAdmin/TenantsDashboard';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import BranchManagement from './pages/Admin/BranchManagement';
 import Reports from './pages/Admin/Reports';
+import StaffManagement from './pages/staff/StaffManagement';
+import StaffDashboard from './pages/staff/StaffDashboard';
+import StaffDirectory from './pages/staff/StaffDirectory';
+import StaffForm from './pages/staff/StaffForm';
+import StaffProfileView from './pages/staff/StaffProfileView';
+import AttendanceManagement from './pages/staff/AttendanceManagement';
+import LeaveManagement from './pages/staff/LeaveManagement';
+import StaffPlaceholder from './pages/staff/StaffPlaceholder';
+import StaffRolesPermissions from './pages/staff/StaffRolesPermissions';
 
 import Locations from './pages/inventory/Location';
 import DesignMaster from './pages/inventory/DesignMaster';
@@ -70,6 +79,34 @@ export default function App() {
           } />
           <Route path="/admin/reports" element={
             <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><Reports /></ProtectedRoute>
+          } />
+          {/* Staff Management */}
+          <Route path="/admin/staff" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><StaffDashboard /></ProtectedRoute>
+          } />
+          <Route path="/admin/staff/directory" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><StaffDirectory /></ProtectedRoute>
+          } />
+          <Route path="/admin/staff/add" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><StaffForm mode="create" /></ProtectedRoute>
+          } />
+          <Route path="/admin/staff/:id" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><StaffProfileView /></ProtectedRoute>
+          } />
+          <Route path="/admin/staff/:id/edit" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><StaffForm mode="edit" /></ProtectedRoute>
+          } />
+          <Route path="/admin/staff/attendance" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><AttendanceManagement /></ProtectedRoute>
+          } />
+          <Route path="/admin/staff/leaves" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><LeaveManagement /></ProtectedRoute>
+          } />
+          <Route path="/admin/staff/roles" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><StaffRolesPermissions /></ProtectedRoute>
+          } />
+          <Route path="/admin/staff/activity-logs" element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><StaffPlaceholder /></ProtectedRoute>
           } />
 
           {/* Inventory */}

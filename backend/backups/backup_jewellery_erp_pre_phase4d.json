@@ -1,0 +1,202 @@
+{
+  "timestamp": "2026-10-11T09:07:59.314Z",
+  "database": "jewellery_erp",
+  "host": "127.0.0.1",
+  "tables": [
+    {
+      "name": "attendances",
+      "createTable": "CREATE TABLE `attendances` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `staff_id` int(11) NOT NULL,\n  `user_id` int(11) DEFAULT NULL,\n  `attendance_date` date NOT NULL,\n  `shift_id` int(11) DEFAULT NULL,\n  `shift_name` varchar(100) DEFAULT NULL,\n  `scheduled_check_in` time DEFAULT NULL,\n  `scheduled_check_out` time DEFAULT NULL,\n  `is_overnight` tinyint(1) NOT NULL DEFAULT 0,\n  `actual_check_in` time DEFAULT NULL,\n  `actual_check_out` time DEFAULT NULL,\n  `status` enum('PRESENT','ABSENT','HALF_DAY','WEEKLY_OFF','HOLIDAY','ON_LEAVE') NOT NULL DEFAULT 'PRESENT',\n  `late_minutes` int(11) NOT NULL DEFAULT 0,\n  `early_departure_minutes` int(11) NOT NULL DEFAULT 0,\n  `working_hours` decimal(5,2) DEFAULT NULL,\n  `remarks` text DEFAULT NULL,\n  `correction_reason` text DEFAULT NULL,\n  `corrected_by_id` int(11) DEFAULT NULL,\n  `corrected_at` datetime DEFAULT NULL,\n  `created_at` datetime NOT NULL DEFAULT current_timestamp(),\n  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uk_attendance_tenant_staff_date` (`tenant_id`,`staff_id`,`attendance_date`),\n  KEY `branch_id` (`branch_id`),\n  KEY `staff_id` (`staff_id`),\n  KEY `user_id` (`user_id`),\n  KEY `shift_id` (`shift_id`),\n  KEY `corrected_by_id` (`corrected_by_id`),\n  KEY `idx_attendance_tenant_date` (`tenant_id`,`attendance_date`),\n  KEY `idx_attendance_tenant_branch_date` (`tenant_id`,`branch_id`,`attendance_date`),\n  KEY `idx_attendance_tenant_status` (`tenant_id`,`status`),\n  CONSTRAINT `attendances_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `attendances_ibfk_2` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON UPDATE CASCADE,\n  CONSTRAINT `attendances_ibfk_3` FOREIGN KEY (`staff_id`) REFERENCES `staff_profiles` (`id`) ON UPDATE CASCADE,\n  CONSTRAINT `attendances_ibfk_4` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `attendances_ibfk_5` FOREIGN KEY (`shift_id`) REFERENCES `shifts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `attendances_ibfk_6` FOREIGN KEY (`corrected_by_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 10
+    },
+    {
+      "name": "audit_logs",
+      "createTable": "CREATE TABLE `audit_logs` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) DEFAULT NULL,\n  `table_name` varchar(255) NOT NULL,\n  `record_id` int(11) NOT NULL,\n  `action` enum('CREATE','UPDATE','DELETE') NOT NULL,\n  `before_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`before_data`)),\n  `after_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`after_data`)),\n  `operator_id` int(11) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `operator_id` (`operator_id`),\n  CONSTRAINT `audit_logs_ibfk_1` FOREIGN KEY (`operator_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 149
+    },
+    {
+      "name": "branches",
+      "createTable": "CREATE TABLE `branches` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `address` varchar(255) DEFAULT NULL,\n  `gstin` varchar(255) DEFAULT NULL,\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `tenant_id` (`tenant_id`),\n  CONSTRAINT `branches_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 11
+    },
+    {
+      "name": "bulk_items",
+      "createTable": "CREATE TABLE `bulk_items` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `item_id` int(11) NOT NULL,\n  `total_pieces` int(11) NOT NULL,\n  `total_gross_weight` decimal(10,3) NOT NULL,\n  `total_net_weight` decimal(10,3) NOT NULL,\n  `calculated_avg_net_weight` decimal(10,4) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `item_id` (`item_id`),\n  CONSTRAINT `bulk_items_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 2
+    },
+    {
+      "name": "categories",
+      "createTable": "CREATE TABLE `categories` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `code` varchar(255) NOT NULL,\n  `gender_applicable` enum('MALE','FEMALE','UNISEX','KIDS','ALL') DEFAULT 'ALL',\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `categories_tenant_id_code` (`tenant_id`,`code`)\n) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 5
+    },
+    {
+      "name": "customers",
+      "createTable": "CREATE TABLE `customers` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `phone` varchar(255) NOT NULL,\n  `email` varchar(255) DEFAULT NULL,\n  `address` varchar(255) DEFAULT NULL,\n  `gstin` varchar(255) DEFAULT NULL,\n  `opening_balance` decimal(14,2) DEFAULT 0.00,\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `customers_tenant_id_phone` (`tenant_id`,`phone`)\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 1
+    },
+    {
+      "name": "gold_rates",
+      "createTable": "CREATE TABLE `gold_rates` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) DEFAULT NULL,\n  `rate_date` date NOT NULL,\n  `metal_type` enum('GOLD','SILVER','PLATINUM','BANDHEL') NOT NULL,\n  `purity` varchar(255) NOT NULL,\n  `rate_per_gram` decimal(10,2) NOT NULL,\n  `created_by` int(11) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `gold_rates_tenant_id_metal_type_purity_rate_date` (`tenant_id`,`metal_type`,`purity`,`rate_date`)\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 3
+    },
+    {
+      "name": "invoices",
+      "createTable": "CREATE TABLE `invoices` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `sale_id` int(11) NOT NULL,\n  `invoice_number` varchar(255) NOT NULL,\n  `generated_at` datetime DEFAULT NULL,\n  `total_amount` decimal(14,2) NOT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `sale_id` (`sale_id`),\n  UNIQUE KEY `invoices_tenant_id_invoice_number` (`tenant_id`,`invoice_number`),\n  CONSTRAINT `invoices_ibfk_1` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "item_images",
+      "createTable": "CREATE TABLE `item_images` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `item_id` int(11) NOT NULL,\n  `image_url` varchar(255) NOT NULL,\n  `sort_order` int(11) DEFAULT 0,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `item_id` (`item_id`),\n  CONSTRAINT `item_images_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "items",
+      "createTable": "CREATE TABLE `items` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `location_id` int(11) NOT NULL,\n  `mode` enum('BULK','PIECE') NOT NULL,\n  `huid_code` varchar(6) DEFAULT NULL,\n  `barcode_value` varchar(255) DEFAULT NULL,\n  `qr_code_data_url` text DEFAULT NULL,\n  `low_stock_threshold` decimal(10,3) DEFAULT NULL,\n  `status` enum('IN_STOCK','SOLD','RESERVED','IN_TRANSIT') DEFAULT 'IN_STOCK',\n  `source_type` enum('SUPPLIER_PURCHASE','BRANCH_TRANSFER','DIRECT_ENTRY') NOT NULL DEFAULT 'DIRECT_ENTRY',\n  `source_reference_id` int(11) DEFAULT NULL,\n  `is_wholesale` tinyint(1) DEFAULT 0,\n  `is_retail` tinyint(1) DEFAULT 1,\n  `is_tray_display` tinyint(1) DEFAULT 0,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  `item_name` varchar(255) NOT NULL,\n  `item_type` varchar(255) NOT NULL,\n  `item_subtype` varchar(255) DEFAULT NULL,\n  `gender_category` enum('MALE','FEMALE','UNISEX','KIDS') DEFAULT 'UNISEX',\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `barcode_value` (`barcode_value`),\n  UNIQUE KEY `barcode_value_2` (`barcode_value`),\n  KEY `location_id` (`location_id`),\n  CONSTRAINT `items_ibfk_3` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 2
+    },
+    {
+      "name": "locations",
+      "createTable": "CREATE TABLE `locations` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `parent_id` int(11) DEFAULT NULL,\n  `name` varchar(255) NOT NULL,\n  `level` int(11) NOT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `branch_id` (`branch_id`),\n  KEY `parent_id` (`parent_id`),\n  CONSTRAINT `locations_ibfk_5` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `locations_ibfk_6` FOREIGN KEY (`parent_id`) REFERENCES `locations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 1
+    },
+    {
+      "name": "manufacturing_orders",
+      "createTable": "CREATE TABLE `manufacturing_orders` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `order_number` varchar(255) NOT NULL,\n  `karigar_name` varchar(255) NOT NULL,\n  `product_master_id` int(11) NOT NULL,\n  `raw_material_id` int(11) DEFAULT NULL,\n  `issued_weight` decimal(10,3) NOT NULL,\n  `expected_pieces` int(11) DEFAULT NULL,\n  `expected_finish_date` date DEFAULT NULL,\n  `status` enum('ISSUED','IN_PROGRESS','RECEIVED','CANCELLED') DEFAULT 'ISSUED',\n  `received_weight` decimal(10,3) DEFAULT NULL,\n  `received_pieces` int(11) DEFAULT NULL,\n  `wastage_weight` decimal(10,3) DEFAULT NULL,\n  `notes` varchar(255) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `manufacturing_orders_tenant_id_order_number` (`tenant_id`,`order_number`),\n  KEY `product_master_id` (`product_master_id`),\n  KEY `raw_material_id` (`raw_material_id`),\n  CONSTRAINT `manufacturing_orders_ibfk_1` FOREIGN KEY (`product_master_id`) REFERENCES `product_masters` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,\n  CONSTRAINT `manufacturing_orders_ibfk_2` FOREIGN KEY (`raw_material_id`) REFERENCES `raw_materials` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "metal_details",
+      "createTable": "CREATE TABLE `metal_details` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `item_id` int(11) NOT NULL,\n  `metal_type` enum('GOLD','SILVER','PLATINUM','BANDHEL') NOT NULL,\n  `purity` varchar(255) NOT NULL,\n  `gross_weight` decimal(10,3) NOT NULL,\n  `less_weight` decimal(10,3) DEFAULT 0.000,\n  `stone_weight` decimal(10,3) DEFAULT 0.000,\n  `base_core_weight` decimal(10,3) DEFAULT NULL,\n  `precious_overlay_weight` decimal(10,3) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `item_id` (`item_id`),\n  CONSTRAINT `metal_details_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 2
+    },
+    {
+      "name": "piece_items",
+      "createTable": "CREATE TABLE `piece_items` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `item_id` int(11) NOT NULL,\n  `sku` varchar(255) NOT NULL,\n  `gross_weight` decimal(10,3) NOT NULL,\n  `less_weight` decimal(10,3) DEFAULT 0.000,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `item_id` (`item_id`),\n  UNIQUE KEY `sku` (`sku`),\n  UNIQUE KEY `sku_2` (`sku`),\n  CONSTRAINT `piece_items_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "price_snapshots",
+      "createTable": "CREATE TABLE `price_snapshots` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `item_id` int(11) NOT NULL,\n  `sale_item_id` int(11) DEFAULT NULL,\n  `profile_type` enum('RETAIL','WHOLESALE') NOT NULL,\n  `gold_rate_used` decimal(10,2) NOT NULL,\n  `purity` varchar(255) NOT NULL,\n  `net_weight_used` decimal(10,3) NOT NULL,\n  `gold_value` decimal(12,2) NOT NULL,\n  `making_charge_amount` decimal(12,2) NOT NULL DEFAULT 0.00,\n  `wastage_amount` decimal(12,2) NOT NULL DEFAULT 0.00,\n  `stone_value` decimal(12,2) NOT NULL DEFAULT 0.00,\n  `other_charges` decimal(12,2) NOT NULL DEFAULT 0.00,\n  `gst_amount` decimal(12,2) NOT NULL DEFAULT 0.00,\n  `final_price` decimal(12,2) NOT NULL,\n  `snapshot_at` datetime DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `item_id` (`item_id`),\n  KEY `sale_item_id` (`sale_item_id`),\n  CONSTRAINT `price_snapshots_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,\n  CONSTRAINT `price_snapshots_ibfk_2` FOREIGN KEY (`sale_item_id`) REFERENCES `sale_items` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "pricing_profiles",
+      "createTable": "CREATE TABLE `pricing_profiles` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) DEFAULT NULL,\n  `category_id` int(11) DEFAULT NULL,\n  `profile_type` enum('RETAIL','WHOLESALE') NOT NULL,\n  `making_charge_type` enum('PER_GRAM','PERCENT_OF_GOLD','FLAT') NOT NULL DEFAULT 'PERCENT_OF_GOLD',\n  `making_charge_value` decimal(10,2) NOT NULL DEFAULT 0.00,\n  `wastage_percent` decimal(5,2) NOT NULL DEFAULT 0.00,\n  `gst_percent` decimal(5,2) NOT NULL DEFAULT 3.00,\n  `other_charges_flat` decimal(10,2) NOT NULL DEFAULT 0.00,\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `category_id` (`category_id`),\n  CONSTRAINT `pricing_profiles_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 2
+    },
+    {
+      "name": "product_masters",
+      "createTable": "CREATE TABLE `product_masters` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) DEFAULT NULL,\n  `category_id` int(11) NOT NULL,\n  `design_code` varchar(255) NOT NULL,\n  `product_name` varchar(255) NOT NULL,\n  `item_subtype` varchar(255) DEFAULT NULL,\n  `gender_category` enum('MALE','FEMALE','UNISEX','KIDS') DEFAULT 'UNISEX',\n  `metal_type` enum('GOLD','SILVER','PLATINUM','BANDHEL') NOT NULL,\n  `default_purity` varchar(255) NOT NULL,\n  `making_charge_type` enum('PER_GRAM','PERCENT_OF_GOLD','FLAT') DEFAULT NULL,\n  `making_charge_value` decimal(10,2) DEFAULT NULL,\n  `wastage_percent_override` decimal(5,2) DEFAULT NULL,\n  `default_image_url` varchar(255) DEFAULT NULL,\n  `description` text DEFAULT NULL,\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `product_masters_tenant_id_design_code` (`tenant_id`,`design_code`),\n  KEY `category_id` (`category_id`),\n  CONSTRAINT `product_masters_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 3
+    },
+    {
+      "name": "purchase_items",
+      "createTable": "CREATE TABLE `purchase_items` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `purchase_id` int(11) NOT NULL,\n  `product_master_id` int(11) NOT NULL,\n  `quantity` int(11) NOT NULL DEFAULT 1,\n  `gross_weight` decimal(10,3) NOT NULL,\n  `net_weight` decimal(10,3) NOT NULL,\n  `purity` varchar(255) NOT NULL,\n  `rate_used` decimal(10,2) DEFAULT NULL,\n  `amount` decimal(14,2) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `purchase_id` (`purchase_id`),\n  KEY `product_master_id` (`product_master_id`),\n  CONSTRAINT `purchase_items_ibfk_1` FOREIGN KEY (`purchase_id`) REFERENCES `purchases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `purchase_items_ibfk_2` FOREIGN KEY (`product_master_id`) REFERENCES `product_masters` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "purchases",
+      "createTable": "CREATE TABLE `purchases` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `purchase_number` varchar(255) NOT NULL,\n  `purchase_date` date NOT NULL,\n  `metal_type` enum('GOLD','SILVER','PLATINUM','BANDHEL') NOT NULL,\n  `gross_weight` decimal(10,3) NOT NULL,\n  `tunch_percentage` decimal(5,2) DEFAULT NULL,\n  `pure_weight_24k_equivalent` decimal(10,3) DEFAULT NULL,\n  `subtotal_amount` decimal(14,2) DEFAULT 0.00,\n  `tax_amount` decimal(14,2) DEFAULT 0.00,\n  `total_amount` decimal(14,2) DEFAULT 0.00,\n  `verification_status` enum('PENDING_TUNCH','VERIFIED') DEFAULT 'PENDING_TUNCH',\n  `is_jangad` tinyint(1) DEFAULT 0,\n  `received_into_inventory` tinyint(1) DEFAULT 0,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  `vendor_id` int(11) NOT NULL,\n  `amount` decimal(14,2) DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `purchases_tenant_id_purchase_number` (`tenant_id`,`purchase_number`),\n  KEY `purchases_vendor_id_foreign_idx` (`vendor_id`),\n  CONSTRAINT `purchases_vendor_id_foreign_idx` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "purity_masters",
+      "createTable": "CREATE TABLE `purity_masters` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `metal_type` enum('GOLD','SILVER','PLATINUM','BANDHEL') NOT NULL,\n  `purity_code` varchar(255) NOT NULL,\n  `fineness_percent` decimal(5,2) DEFAULT NULL,\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `purity_masters_tenant_id_metal_type_purity_code` (`tenant_id`,`metal_type`,`purity_code`)\n) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 4
+    },
+    {
+      "name": "raw_materials",
+      "createTable": "CREATE TABLE `raw_materials` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `location_id` int(11) DEFAULT NULL,\n  `material_type` enum('GOLD','SILVER','DIAMOND','STONE','OTHER') NOT NULL,\n  `purity` varchar(255) DEFAULT NULL,\n  `quantity` decimal(12,3) NOT NULL DEFAULT 0.000,\n  `unit` enum('GRAM','CARAT','PIECE','KG') DEFAULT 'GRAM',\n  `notes` varchar(255) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 1
+    },
+    {
+      "name": "repair_orders",
+      "createTable": "CREATE TABLE `repair_orders` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `item_id` int(11) DEFAULT NULL,\n  `customer_id` int(11) DEFAULT NULL,\n  `order_type` enum('CUSTOMER_REPAIR','INTERNAL_REPAIR','DAMAGE') NOT NULL,\n  `sent_to_karigar` varchar(255) DEFAULT NULL,\n  `issue_description` varchar(255) DEFAULT NULL,\n  `sent_date` date DEFAULT NULL,\n  `expected_return_date` date DEFAULT NULL,\n  `received_date` date DEFAULT NULL,\n  `repair_charge` decimal(10,2) DEFAULT NULL,\n  `status` enum('PENDING','IN_PROGRESS','COMPLETED','CANCELLED') DEFAULT 'PENDING',\n  `notes` varchar(255) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `item_id` (`item_id`),\n  KEY `customer_id` (`customer_id`),\n  CONSTRAINT `repair_orders_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `repair_orders_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "sale_items",
+      "createTable": "CREATE TABLE `sale_items` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `sale_id` int(11) NOT NULL,\n  `item_id` int(11) NOT NULL,\n  `gold_rate_used` decimal(10,2) NOT NULL,\n  `purity` varchar(255) NOT NULL,\n  `net_weight_used` decimal(10,3) NOT NULL,\n  `gold_value` decimal(12,2) NOT NULL,\n  `making_charge_amount` decimal(12,2) DEFAULT 0.00,\n  `wastage_amount` decimal(12,2) DEFAULT 0.00,\n  `stone_value` decimal(12,2) DEFAULT 0.00,\n  `gst_amount` decimal(12,2) DEFAULT 0.00,\n  `final_price` decimal(12,2) NOT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `sale_id` (`sale_id`),\n  KEY `item_id` (`item_id`),\n  CONSTRAINT `sale_items_ibfk_1` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `sale_items_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "sales",
+      "createTable": "CREATE TABLE `sales` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `customer_id` int(11) DEFAULT NULL,\n  `sale_number` varchar(255) NOT NULL,\n  `sale_date` date NOT NULL,\n  `sale_type` enum('RETAIL','WHOLESALE') NOT NULL DEFAULT 'RETAIL',\n  `subtotal_amount` decimal(14,2) DEFAULT 0.00,\n  `discount_amount` decimal(14,2) DEFAULT 0.00,\n  `gst_amount` decimal(14,2) DEFAULT 0.00,\n  `total_amount` decimal(14,2) DEFAULT 0.00,\n  `payment_status` enum('PAID','PARTIAL','UNPAID') DEFAULT 'UNPAID',\n  `status` enum('DRAFT','CONFIRMED','CANCELLED') DEFAULT 'DRAFT',\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `sales_tenant_id_sale_number` (`tenant_id`,`sale_number`),\n  KEY `customer_id` (`customer_id`),\n  CONSTRAINT `sales_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "shifts",
+      "createTable": "CREATE TABLE `shifts` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) DEFAULT NULL,\n  `name` varchar(100) NOT NULL,\n  `start_time` time NOT NULL,\n  `end_time` time NOT NULL,\n  `grace_period_minutes` int(11) NOT NULL DEFAULT 15,\n  `half_day_threshold_hours` decimal(4,2) NOT NULL DEFAULT 4.00,\n  `is_overnight` tinyint(1) NOT NULL DEFAULT 0,\n  `is_active` tinyint(1) NOT NULL DEFAULT 1,\n  `created_at` datetime NOT NULL DEFAULT current_timestamp(),\n  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uk_shifts_tenant_name` (`tenant_id`,`name`),\n  KEY `branch_id` (`branch_id`),\n  KEY `idx_shifts_tenant_branch` (`tenant_id`,`branch_id`),\n  CONSTRAINT `shifts_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `shifts_ibfk_2` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 2
+    },
+    {
+      "name": "staff_profiles",
+      "createTable": "CREATE TABLE `staff_profiles` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `user_id` int(11) DEFAULT NULL,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) DEFAULT NULL,\n  `employee_id` varchar(255) DEFAULT NULL,\n  `first_name` varchar(100) DEFAULT NULL,\n  `last_name` varchar(100) DEFAULT NULL,\n  `email` varchar(255) DEFAULT NULL,\n  `profile_photo` varchar(255) DEFAULT NULL,\n  `phone` varchar(255) DEFAULT NULL,\n  `dob` date DEFAULT NULL,\n  `gender` enum('MALE','FEMALE','OTHER','PREFER_NOT_TO_SAY') DEFAULT NULL,\n  `address` text DEFAULT NULL,\n  `emergency_contact_name` varchar(150) DEFAULT NULL,\n  `emergency_contact_phone` varchar(50) DEFAULT NULL,\n  `department` varchar(255) DEFAULT NULL,\n  `designation` varchar(255) DEFAULT NULL,\n  `assigned_shift_id` int(11) DEFAULT NULL,\n  `employment_type` enum('FULL_TIME','PART_TIME','CONTRACT','INTERN','PROBATION') NOT NULL DEFAULT 'FULL_TIME',\n  `reporting_manager_id` int(11) DEFAULT NULL,\n  `joining_date` date DEFAULT NULL,\n  `status` enum('ACTIVE','INACTIVE','ON_LEAVE','SUSPENDED') NOT NULL DEFAULT 'ACTIVE',\n  `notes` text DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  `transfer_history` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`transfer_history`)),\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `user_id` (`user_id`),\n  UNIQUE KEY `uniq_tenant_employee_id` (`tenant_id`,`employee_id`),\n  KEY `idx_staff_tenant_branch` (`tenant_id`,`branch_id`),\n  KEY `idx_staff_tenant_dept` (`tenant_id`,`department`),\n  KEY `fk_staff_profiles_branch` (`branch_id`),\n  KEY `fk_staff_profiles_manager` (`reporting_manager_id`),\n  KEY `idx_staff_profiles_assigned_shift` (`assigned_shift_id`),\n  CONSTRAINT `fk_staff_profiles_branch` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `fk_staff_profiles_manager` FOREIGN KEY (`reporting_manager_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `fk_staff_profiles_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `staff_profiles_assigned_shift_id_foreign_idx` FOREIGN KEY (`assigned_shift_id`) REFERENCES `shifts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `staff_profiles_ibfk_2` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 26
+    },
+    {
+      "name": "stock_adjustments",
+      "createTable": "CREATE TABLE `stock_adjustments` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `item_id` int(11) NOT NULL,\n  `system_quantity` decimal(10,3) NOT NULL,\n  `physical_quantity` decimal(10,3) NOT NULL,\n  `reason` varchar(255) DEFAULT NULL,\n  `adjusted_by` int(11) NOT NULL,\n  `adjusted_at` datetime DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `item_id` (`item_id`),\n  CONSTRAINT `stock_adjustments_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "stock_audit_items",
+      "createTable": "CREATE TABLE `stock_audit_items` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `audit_id` int(11) NOT NULL,\n  `item_id` int(11) NOT NULL,\n  `system_quantity` decimal(10,3) NOT NULL,\n  `physical_quantity` decimal(10,3) NOT NULL,\n  `remarks` varchar(255) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `audit_id` (`audit_id`),\n  KEY `item_id` (`item_id`),\n  CONSTRAINT `stock_audit_items_ibfk_1` FOREIGN KEY (`audit_id`) REFERENCES `stock_audits` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `stock_audit_items_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "stock_audits",
+      "createTable": "CREATE TABLE `stock_audits` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `audit_date` date NOT NULL,\n  `conducted_by` int(11) NOT NULL,\n  `status` enum('IN_PROGRESS','COMPLETED') DEFAULT 'IN_PROGRESS',\n  `notes` varchar(255) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "stock_movements",
+      "createTable": "CREATE TABLE `stock_movements` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `item_id` int(11) NOT NULL,\n  `movement_type` enum('PURCHASE','TRANSFER_OUT','TRANSFER_IN','SALE','RETURN','ADJUSTMENT','REPAIR_OUT','REPAIR_IN','MANUFACTURING_IN') NOT NULL,\n  `quantity_change` int(11) NOT NULL DEFAULT 0,\n  `weight_change` decimal(10,3) NOT NULL DEFAULT 0.000,\n  `from_location_id` int(11) DEFAULT NULL,\n  `to_location_id` int(11) DEFAULT NULL,\n  `reference_type` varchar(255) DEFAULT NULL,\n  `reference_id` int(11) DEFAULT NULL,\n  `notes` varchar(255) DEFAULT NULL,\n  `created_by` int(11) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `item_id` (`item_id`),\n  CONSTRAINT `stock_movements_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 3
+    },
+    {
+      "name": "stock_reservations",
+      "createTable": "CREATE TABLE `stock_reservations` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `item_id` int(11) NOT NULL,\n  `reserved_for_customer_id` int(11) DEFAULT NULL,\n  `reserved_by_user_id` int(11) NOT NULL,\n  `reserved_at` datetime DEFAULT NULL,\n  `expires_at` datetime DEFAULT NULL,\n  `status` enum('ACTIVE','RELEASED','CONVERTED') DEFAULT 'ACTIVE',\n  `notes` varchar(255) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `item_id` (`item_id`),\n  KEY `reserved_for_customer_id` (`reserved_for_customer_id`),\n  CONSTRAINT `stock_reservations_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `stock_reservations_ibfk_2` FOREIGN KEY (`reserved_for_customer_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "stock_transfers",
+      "createTable": "CREATE TABLE `stock_transfers` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `item_id` int(11) NOT NULL,\n  `original_item_id` int(11) DEFAULT NULL,\n  `from_branch_id` int(11) NOT NULL,\n  `to_branch_id` int(11) NOT NULL,\n  `to_location_id` int(11) DEFAULT NULL,\n  `quantity_transferred` int(11) DEFAULT NULL,\n  `status` enum('IN_TRANSIT','RECEIVED','REJECTED','CANCELLED') DEFAULT 'IN_TRANSIT',\n  `requested_by` int(11) NOT NULL,\n  `received_by` int(11) DEFAULT NULL,\n  `notes` varchar(255) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `item_id` (`item_id`),\n  KEY `from_branch_id` (`from_branch_id`),\n  KEY `to_branch_id` (`to_branch_id`),\n  CONSTRAINT `stock_transfers_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `stock_transfers_ibfk_2` FOREIGN KEY (`from_branch_id`) REFERENCES `branches` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,\n  CONSTRAINT `stock_transfers_ibfk_3` FOREIGN KEY (`to_branch_id`) REFERENCES `branches` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "stone_details",
+      "createTable": "CREATE TABLE `stone_details` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `item_id` int(11) NOT NULL,\n  `stone_type` enum('NATURAL_DIAMOND','LAB_GROWN_DIAMOND','RUBY','SYNTHETIC','OTHER') NOT NULL,\n  `stone_pieces_count` int(11) NOT NULL DEFAULT 0,\n  `stone_weight_carat` decimal(10,3) NOT NULL DEFAULT 0.000,\n  `color` varchar(255) DEFAULT NULL,\n  `clarity` varchar(255) DEFAULT NULL,\n  `cut` varchar(255) DEFAULT NULL,\n  `lab_code` varchar(255) DEFAULT NULL,\n  `stone_rate` decimal(12,2) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `item_id` (`item_id`),\n  CONSTRAINT `stone_details_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "stone_masters",
+      "createTable": "CREATE TABLE `stone_masters` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `stone_type` enum('NATURAL_DIAMOND','LAB_GROWN_DIAMOND','RUBY','EMERALD','SAPPHIRE','SYNTHETIC','OTHER') NOT NULL,\n  `default_rate_per_carat` decimal(12,2) DEFAULT NULL,\n  `unit` varchar(255) DEFAULT 'CARAT',\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `stone_masters_tenant_id_stone_type` (`tenant_id`,`stone_type`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "supplier_ledgers",
+      "createTable": "CREATE TABLE `supplier_ledgers` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `supplier_id` int(11) NOT NULL,\n  `currency_balance` decimal(14,2) DEFAULT 0.00,\n  `pure_metal_balance_24k_grams` decimal(12,4) DEFAULT 0.0000,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `supplier_id` (`supplier_id`),\n  CONSTRAINT `supplier_ledgers_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "suppliers",
+      "createTable": "CREATE TABLE `suppliers` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `phone` varchar(255) DEFAULT NULL,\n  `email` varchar(255) DEFAULT NULL,\n  `address` varchar(255) DEFAULT NULL,\n  `gstin` varchar(255) DEFAULT NULL,\n  `opening_balance` decimal(14,2) DEFAULT 0.00,\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    },
+    {
+      "name": "tenants",
+      "createTable": "CREATE TABLE `tenants` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `name` varchar(255) NOT NULL,\n  `owner_email` varchar(255) NOT NULL,\n  `owner_phone` varchar(255) DEFAULT NULL,\n  `subscription_plan` enum('TRIAL','BASIC','PRO','ENTERPRISE') DEFAULT 'TRIAL',\n  `max_branches` int(11) DEFAULT 1,\n  `status` enum('ACTIVE','SUSPENDED','CANCELLED') DEFAULT 'ACTIVE',\n  `subscription_expires_at` datetime DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `owner_email` (`owner_email`),\n  UNIQUE KEY `owner_email_2` (`owner_email`),\n  UNIQUE KEY `owner_email_3` (`owner_email`),\n  UNIQUE KEY `owner_email_4` (`owner_email`)\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 3
+    },
+    {
+      "name": "users",
+      "createTable": "CREATE TABLE `users` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `name` varchar(255) NOT NULL,\n  `tenant_id` int(11) DEFAULT NULL,\n  `branch_id` int(11) DEFAULT NULL,\n  `email` varchar(255) NOT NULL,\n  `password_hash` varchar(255) NOT NULL,\n  `role` enum('SUPER_ADMIN','ADMIN','MANAGER','SALESMAN','KARIGAR_INCHARGE') NOT NULL DEFAULT 'ADMIN',\n  `is_active` tinyint(1) DEFAULT 1,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `email` (`email`),\n  UNIQUE KEY `email_2` (`email`),\n  UNIQUE KEY `email_3` (`email`),\n  KEY `tenant_id` (`tenant_id`),\n  KEY `branch_id` (`branch_id`),\n  CONSTRAINT `users_ibfk_5` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `users_ibfk_6` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL ON UPDATE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 22
+    },
+    {
+      "name": "vendors",
+      "createTable": "CREATE TABLE `vendors` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenant_id` int(11) NOT NULL,\n  `branch_id` int(11) NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `gstin` varchar(255) DEFAULT NULL,\n  `phone` varchar(255) DEFAULT NULL,\n  `address` varchar(255) DEFAULT NULL,\n  `created_at` datetime NOT NULL,\n  `updated_at` datetime NOT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci",
+      "rowCount": 0
+    }
+  ]
+}

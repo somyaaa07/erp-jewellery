@@ -29,7 +29,7 @@ export default function Pricing() {
   return (
     <div>
       <h1>Retail & Wholesale Pricing</h1>
-      <p style={{ color: '#6b7280', marginTop: -10 }}>
+      <p style={{ color: 'var(--text-muted)', marginTop: -10 }}>
         Set separate making charges and wastage percentages for retail and wholesale. Stock sold from the display tray is billed with the retail rule, and stock sold from the wholesale box with the wholesale rule; the metal rate itself stays the same for both.
       </p>
 
@@ -84,7 +84,7 @@ export default function Pricing() {
                 <td>{p.wastage_percent}%</td>
                 <td>{p.gst_percent}%</td>
                 <td>
-                  <button className="btn" style={{ background: p.is_active ? '#059669' : '#9ca3af' }}
+                  <button className="btn" style={{ background: p.is_active ? 'var(--success)' : 'var(--border-strong)', color: p.is_active ? '#FFFFFF' : 'var(--text-muted)' }}
                     onClick={() => update(p.id, 'is_active', !p.is_active)}>
                     {p.is_active ? 'Active' : 'Inactive'}
                   </button>

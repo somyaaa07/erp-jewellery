@@ -88,6 +88,9 @@ db.sequelize = sequelize;
   "Purchase",
   "Expense",
   "KarigarLedger",
+  "StaffProfile",
+  "Attendance",
+  "LeaveRequest",
 ].forEach((name) => {
   if (db[name]) {
     attachAuditHooks(db[name]);

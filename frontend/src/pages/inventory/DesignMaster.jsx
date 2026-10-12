@@ -45,7 +45,7 @@ export default function DesignMaster() {
   return (
     <div>
       <h1>Designs & Categories</h1>
-      <p style={{ color: '#6b7280', marginTop: -10 }}>
+      <p style={{ color: 'var(--text-muted)', marginTop: -10 }}>
         Create designs such as "Male Ring" or "Female Necklace" once. When adding stock you pick the design, which is why the same design never creates a duplicate row - only its quantity is merged.
       </p>
 

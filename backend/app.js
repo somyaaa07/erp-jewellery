@@ -8,6 +8,10 @@ import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import tenantRoutes from "./src/routes/tenantRoutes.js";
 import branchRoutes from "./src/routes/branchRoutes.js";
+import staffRoutes from "./src/routes/staffRoutes.js";
+import attendanceRoutes from "./src/routes/attendanceRoutes.js";
+import shiftRoutes from "./src/routes/shiftRoutes.js";
+import leaveRoutes from "./src/routes/leaveRoutes.js";
 import errorHandler from "./src/middlewares/errorHandler.js";
 import locationRoutes from './src/routes/locationRoutes.js';
 
@@ -68,6 +72,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/super-admin/tenants", tenantRoutes);
 app.use("/api/branches", branchRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api/attendance", attendanceRoutes);
+app.use("/api/shifts", shiftRoutes);
+app.use("/api/leaves", leaveRoutes);
 app.use('/api/locations', locationRoutes);
 
 // Phase 1

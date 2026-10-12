@@ -26,7 +26,7 @@ export default function GoldRate() {
   return (
     <div>
       <h1>Metal Rates</h1>
-      <p style={{ color: '#6b7280', marginTop: -10 }}>
+      <p style={{ color: 'var(--text-muted)', marginTop: -10 }}>
         Update the rate here each morning. Every item in inventory is repriced from it automatically, so there is no need to edit prices item by item.
       </p>
 

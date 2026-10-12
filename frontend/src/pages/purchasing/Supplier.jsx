@@ -234,10 +234,10 @@ export default function Supplier() {
                 <td><span className={`badge ${p.verification_status === 'VERIFIED' ? 'green' : 'yellow'}`}>{p.verification_status}</span></td>
                 <td><span className={`badge ${p.received_into_inventory ? 'green' : 'yellow'}`}>{p.received_into_inventory ? 'Received' : 'Not Received'}</span></td>
                 <td>
-                  <button className="btn" style={{ marginRight: 6, background: '#6b7280' }} onClick={() => printReceipt(p.id)}>Receipt</button>
+                  <button className="btn btn-secondary" style={{ marginRight: 6 }} onClick={() => printReceipt(p.id)}>Receipt</button>
                   {p.verification_status === 'PENDING_TUNCH' && <button className="btn" onClick={() => verifyTunch(p.id)}>Verify Tunch</button>}
                   {p.verification_status === 'VERIFIED' && !p.received_into_inventory && (
-                    <button className="btn" style={{ background: '#059669' }} onClick={() => receiveIntoInventory(p)}>Receive into Inventory</button>
+                    <button className="btn btn-success" onClick={() => receiveIntoInventory(p)}>Receive into Inventory</button>
                   )}
                 </td>
               </tr>

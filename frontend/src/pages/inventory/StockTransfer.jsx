@@ -107,7 +107,7 @@ export default function StockTransfer() {
       </form>
 
       {receivingTransfer && (
-        <div className="card" style={{ background: '#f0fdf4' }}>
+        <div className="card" style={{ background: 'var(--success-soft)', border: '1px solid var(--border)' }}>
           <h3 style={{ marginBottom: 12 }}>Receive Transfer #{receivingTransfer.id}</h3>
           <div style={{ display: 'flex', gap: 12, alignItems: 'end' }}>
             <div className="form-group" style={{ flex: 1 }}>
@@ -118,7 +118,7 @@ export default function StockTransfer() {
               </select>
             </div>
             <button className="btn" onClick={confirmReceive}>Confirm Receive</button>
-            <button className="btn" style={{ background: '#9ca3af' }} onClick={() => setReceivingTransfer(null)}>Cancel</button>
+            <button className="btn btn-secondary" onClick={() => setReceivingTransfer(null)}>Cancel</button>
           </div>
         </div>
       )}
@@ -142,8 +142,8 @@ export default function StockTransfer() {
                   {t.status === 'IN_TRANSIT' && (
                     <>
                       <button className="btn" onClick={() => openReceiveForm(t)}>Receive</button>{' '}
-                      <button className="btn" style={{ background: '#dc2626' }} onClick={() => handleReject(t.id)}>Reject</button>{' '}
-                      <button className="btn" style={{ background: '#9ca3af' }} onClick={() => handleCancel(t.id)}>Cancel</button>
+                      <button className="btn btn-danger" onClick={() => handleReject(t.id)}>Reject</button>{' '}
+                      <button className="btn btn-secondary" onClick={() => handleCancel(t.id)}>Cancel</button>
                     </>
                   )}
                 </td>

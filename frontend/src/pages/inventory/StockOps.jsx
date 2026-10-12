@@ -72,7 +72,17 @@ export default function StockOps() {
       <h1>Stock Operations</h1>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {TABS.map((t) => (
-          <button key={t} className="btn" style={{ background: tab === t ? '#1d4ed8' : '#9ca3af' }} onClick={() => setTab(t)}>{t}</button>
+          <button
+            key={t}
+            className="btn"
+            style={{
+              background: tab === t ? 'var(--primary)' : 'var(--border-strong)',
+              color: tab === t ? '#FFFFFF' : 'var(--text-muted)',
+            }}
+            onClick={() => setTab(t)}
+          >
+            {t}
+          </button>
         ))}
       </div>
 
@@ -102,7 +112,7 @@ export default function StockOps() {
                 </div>
               </>
             )}
-            {selectedTrayItem?.mode === 'PIECE' && <p style={{ color: '#6b7280' }}>Single piece - the whole piece moves.</p>}
+            {selectedTrayItem?.mode === 'PIECE' && <p style={{ color: 'var(--text-muted)' }}>Single piece - the whole piece moves.</p>}
             <button className="btn" type="submit">Move</button>
           </form>
           <div className="card">

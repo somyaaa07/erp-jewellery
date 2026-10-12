@@ -140,7 +140,7 @@ export default function Location() {
                 <td>{locations.find((p) => p.id === l.parent_id)?.name || '—'}</td>
                 <td>
                   <button className="btn" style={{ marginRight: 6 }} onClick={() => handleEditCapacity(l)}>Edit capacity</button>
-                  <button className="btn" style={{ background: '#dc2626' }} onClick={() => handleDelete(l.id)}>Delete</button>
+                  <button className="btn btn-danger" onClick={() => handleDelete(l.id)}>Delete</button>
                 </td>
               </tr>
             ))}

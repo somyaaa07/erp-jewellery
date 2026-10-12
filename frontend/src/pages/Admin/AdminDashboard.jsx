@@ -33,7 +33,7 @@ export default function AdminDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16, marginBottom: 20 }}>
         {cards.map((c) => (
           <div className="card" key={c.label}>
-            <div style={{ fontSize: 13, color: '#6b7280' }}>{c.label}</div>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{c.label}</div>
             <div style={{ fontSize: 22, fontWeight: 700 }}>{c.value}</div>
           </div>
         ))}
@@ -52,7 +52,7 @@ export default function AdminDashboard() {
 
       <div className="card">
         <h3 style={{ marginBottom: 12 }}>Low Stock Alerts</h3>
-        {lowStock.length === 0 ? <p style={{ color: '#6b7280', fontSize: 14 }}>No low-stock items right now.</p> : (
+        {lowStock.length === 0 ? <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>No low-stock items right now.</p> : (
           <table>
             <thead><tr><th>Item</th><th>Pieces Left</th><th>Threshold</th></tr></thead>
             <tbody>

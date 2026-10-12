@@ -32,6 +32,7 @@ const ICONS = {
   karigar: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9l-3.7 3.8z',
   reports: 'M3 3v18h18M7 15V9M12 17V5M17 15v-6',
   tenants: 'M3 21h18M5 21V7l7-4 7 4v14M10 21v-5h4v5',
+  staff: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
 };
 
@@ -82,6 +83,19 @@ const NAV_BY_ROLE = {
         { to: '/purchasing/suppliers', label: 'Suppliers & Purchases', icon: 'supplier' },
         { to: '/karigar', label: 'Manufacturing', icon: 'karigar' },
         { to: '/admin/branches', label: 'Branches', icon: 'branch' },
+        {
+          label: 'Staff Management',
+          icon: 'staff',
+          children: [
+            { to: '/admin/staff', label: 'Dashboard', end: true },
+            { to: '/admin/staff/directory', label: 'Staff Directory' },
+            { to: '/admin/staff/add', label: 'Add Staff' },
+            { to: '/admin/staff/attendance', label: 'Attendance' },
+            { to: '/admin/staff/leaves', label: 'Leave Management' },
+            { to: '/admin/staff/roles', label: 'Roles & Permissions' },
+            { to: '/admin/staff/activity-logs', label: 'Activity Logs' },
+          ],
+        },
       ],
     },
   ],
@@ -120,6 +134,19 @@ const NAV_BY_ROLE = {
       links: [
         { to: '/purchasing/suppliers', label: 'Suppliers & Purchases', icon: 'supplier' },
         { to: '/karigar', label: 'Manufacturing', icon: 'karigar' },
+        {
+          label: 'Staff Management',
+          icon: 'staff',
+          children: [
+            { to: '/admin/staff', label: 'Dashboard', end: true },
+            { to: '/admin/staff/directory', label: 'Staff Directory' },
+            { to: '/admin/staff/add', label: 'Add Staff' },
+            { to: '/admin/staff/attendance', label: 'Attendance' },
+            { to: '/admin/staff/leaves', label: 'Leave Management' },
+            { to: '/admin/staff/roles', label: 'Roles & Permissions' },
+            { to: '/admin/staff/activity-logs', label: 'Activity Logs' },
+          ],
+        },
       ],
     },
   ],
@@ -145,6 +172,13 @@ const TITLES = [
   ['/super-admin/tenants', 'Stores'],
   ['/admin/branches', 'Branches'],
   ['/admin/reports', 'Reports'],
+  ['/admin/staff/directory', 'Staff Directory'],
+  ['/admin/staff/add', 'Add Staff'],
+  ['/admin/staff/attendance', 'Attendance'],
+  ['/admin/staff/leaves', 'Leave Management'],
+  ['/admin/staff/roles', 'Roles & Permissions'],
+  ['/admin/staff/activity-logs', 'Activity Logs'],
+  ['/admin/staff', 'Staff Management'],
   ['/admin', 'Dashboard'],
   ['/inventory/items/new', 'Add Stock'],
   ['/inventory/items', 'Stock'],
@@ -170,11 +204,25 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState({
+    'Staff Management': location.pathname.startsWith('/admin/staff'),
+  });
 
   const sections = NAV_BY_ROLE[user?.role] || [];
 
   // Close the drawer whenever the route changes, so mobile navigation feels normal.
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+
+  // Keep submenu open if browsing staff routes
+  useEffect(() => {
+    if (location.pathname.startsWith('/admin/staff')) {
+      setExpandedGroups((prev) => ({ ...prev, 'Staff Management': true }));
+    }
+  }, [location.pathname]);
+
+  const toggleGroup = (groupLabel) => {
+    setExpandedGroups((prev) => ({ ...prev, [groupLabel]: !prev[groupLabel] }));
+  };
 
   const pageTitle = useMemo(() => {
     const match = TITLES.find(([path]) => location.pathname.startsWith(path));
@@ -217,17 +265,57 @@ export default function DashboardLayout() {
           {sections.map((group) => (
             <div className="nav-section" key={group.section}>
               <div className="nav-section-label">{group.section}</div>
-              {group.links.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  end={link.end}
-                  className={({ isActive }) => (isActive ? 'active' : '')}
-                >
-                  <Icon d={ICONS[link.icon] || ICONS.box} />
-                  <span>{link.label}</span>
-                </NavLink>
-              ))}
+              {group.links.map((link) => {
+                if (link.children) {
+                  const isChildActive = link.children.some((child) =>
+                    child.end ? location.pathname === child.to : location.pathname.startsWith(child.to)
+                  );
+                  const isOpen = expandedGroups[link.label] ?? isChildActive;
+
+                  return (
+                    <div key={link.label} className="nav-group">
+                      <button
+                        type="button"
+                        className={`nav-group-btn ${isOpen ? 'open' : ''} ${isChildActive ? 'has-active-child' : ''}`}
+                        onClick={() => toggleGroup(link.label)}
+                        aria-expanded={isOpen}
+                      >
+                        <Icon d={ICONS[link.icon] || ICONS.box} />
+                        <span>{link.label}</span>
+                        <svg className={`nav-chevron ${isOpen ? 'open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      </button>
+                      {isOpen && (
+                        <div className="nav-submenu">
+                          {link.children.map((child) => (
+                            <NavLink
+                              key={child.to}
+                              to={child.to}
+                              end={child.end}
+                              className={({ isActive }) => (isActive ? 'active' : '')}
+                            >
+                              <span>{child.label}</span>
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                return (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    end={link.end}
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    <Icon d={ICONS[link.icon] || ICONS.box} />
+                    <span>{link.label}</span>
+                  </NavLink>
+                );
+              })}
             </div>
           ))}
         </nav>

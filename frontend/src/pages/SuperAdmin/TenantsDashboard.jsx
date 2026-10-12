@@ -258,7 +258,7 @@ export default function TenantsDashboard() {
                 </td>
                 <td>
                   {t.status === 'ACTIVE'
-                    ? <button className="btn" style={{ background: '#f59e0b' }} onClick={() => updateStatus(t.id, 'SUSPENDED')}>Suspend</button>
+                    ? <button className="btn" style={{ background: 'var(--warning)', color: '#FFFFFF' }} onClick={() => updateStatus(t.id, 'SUSPENDED')}>Suspend</button>
                     : <button className="btn" onClick={() => updateStatus(t.id, 'ACTIVE')}>Activate</button>}
                   {' '}
                   <button className="btn" onClick={() => setAdminModalTenant(t)}>+ Admin Login</button>
@@ -281,7 +281,8 @@ export default function TenantsDashboard() {
         .modal-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(15, 23, 42, 0.55);
+          background: rgba(36, 26, 53, 0.6);
+          backdrop-filter: blur(2px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -289,12 +290,13 @@ export default function TenantsDashboard() {
           padding: 16px;
         }
         .modal-panel {
-          background: #fff;
+          background: var(--surface);
+          border: 1px solid var(--border);
           border-radius: 12px;
           width: 100%;
           max-width: 440px;
           padding: 24px;
-          box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+          box-shadow: 0 16px 40px rgba(36, 26, 53, 0.15);
         }
         .modal-header {
           display: flex;
@@ -305,11 +307,12 @@ export default function TenantsDashboard() {
         .modal-header h2 {
           margin: 0;
           font-size: 18px;
+          color: var(--heading);
         }
         .modal-subtitle {
           margin: 4px 0 0;
           font-size: 13px;
-          color: #64748b;
+          color: var(--text-muted);
         }
         .icon-btn {
           background: none;
@@ -317,49 +320,51 @@ export default function TenantsDashboard() {
           font-size: 22px;
           line-height: 1;
           cursor: pointer;
-          color: #94a3b8;
+          color: var(--text-subtle);
           padding: 0 4px;
         }
-        .icon-btn:hover { color: #334155; }
+        .icon-btn:hover { color: var(--heading); }
         .password-row {
           display: flex;
           gap: 6px;
         }
         .password-row input { flex: 1; }
         .btn-ghost {
-          background: #f1f5f9;
-          border: 1px solid #e2e8f0;
+          background: var(--surface-2);
+          border: 1px solid var(--border);
           border-radius: 6px;
           padding: 6px 10px;
           font-size: 12px;
           cursor: pointer;
           white-space: nowrap;
+          color: var(--heading);
         }
-        .btn-ghost:hover { background: #e2e8f0; }
+        .btn-ghost:hover { background: var(--surface-3); }
         .btn-secondary {
-          background: #fff;
-          border: 1px solid #cbd5e1;
+          background: var(--surface);
+          border: 1px solid var(--border);
           border-radius: 6px;
           padding: 8px 14px;
           cursor: pointer;
+          color: var(--heading);
         }
         .field-hint {
           display: block;
           font-size: 12px;
-          color: #94a3b8;
+          color: var(--text-subtle);
           margin-top: 4px;
         }
         .field-error {
           display: block;
           font-size: 12px;
-          color: #dc2626;
+          color: var(--danger);
           margin-top: 4px;
         }
-        .input-error { border-color: #dc2626 !important; }
+        .input-error { border-color: var(--danger) !important; }
         .server-error {
-          background: #fef2f2;
-          color: #b91c1c;
-          border: 1px solid #fecaca;
+          background: var(--danger-soft);
+          color: var(--danger);
+          border: 1px solid #F5C8C3;
           border-radius: 6px;
           padding: 10px 12px;
           font-size: 13px;
@@ -381,8 +386,8 @@ export default function TenantsDashboard() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--surface-2);
+          border: 1px solid var(--border);
           border-radius: 8px;
           padding: 10px 12px;
         }
@@ -391,12 +396,12 @@ export default function TenantsDashboard() {
           font-size: 11px;
           text-transform: uppercase;
           letter-spacing: 0.04em;
-          color: #94a3b8;
+          color: var(--text-subtle);
         }
         .credential-value {
           display: block;
           font-size: 14px;
-          color: #0f172a;
+          color: var(--heading);
           margin-top: 2px;
         }
         .credential-mono { font-family: 'SFMono-Regular', Consolas, monospace; }
